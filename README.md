@@ -9,5 +9,5 @@ Simple template to test openshift build with environment variables
 
 2. template.yml is an Openshift template:
   - it sets `GREETING=Aloha!` on build time so it overrides the Docker env
-  - So when run in Openshift the rack application should display `{"greeting": "Aloha!"}` instead of `hello`
+  - So when run in Openshift the rack application should display `{"greeting": "Aloha!"}` instead of `{"greeting": "hello"}`
 
