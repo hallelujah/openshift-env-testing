@@ -3,6 +3,7 @@ MAINTAINER Hery Ramihajamalala <hery@rails-royce.org>
 
 COPY ./ ./
 
+ARG GREETING
 ENV GREETING=${GREETING:-hello}
 
 RUN echo ${GREETING} > /tmp/greeting.txt \
