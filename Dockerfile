@@ -3,8 +3,8 @@ MAINTAINER Hery Ramihajamalala <hery@rails-royce.org>
 
 COPY ./ ./
 
-ARG GREETING
-ENV GREETING=${GREETING:-hello}
+ARG GREETING=Hello
+ENV GREETING=${GREETING}
 
 RUN echo ${GREETING} > /tmp/greeting.txt \
   && gem install bundler \
