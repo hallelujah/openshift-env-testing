@@ -1,0 +1,94 @@
+kind: "Template"
+apiVersion: "v1"
+metadata:
+  name: "testing-template"
+  annotations:
+    description: "Testint template"
+    tags: "testing,ruby"
+    iconClass: "icon-ruby"
+objects:
+  - kind: "DeploymentConfig"
+    apiVersion: "v1"
+    metadata:
+      name: "app-deploy"
+    spec:
+      template:
+        metadata:
+          labels:
+            name: "application"
+        spec:
+          containers:
+            - name: "rack-server"
+              image: "application"
+              ports:
+                - containerPort: 9292
+                  protocol: "TCP"
+      replicas: 1
+      triggers:
+        - type: "ConfigChange"
+        - type: "ImageChange"
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - "rack-server"
+            from:
+              kind: "ImageStreamTag"
+              name: "application:latest"
+      strategy:
+        type: "Rolling"
+  - kind: "ImageStream"
+    apiVersion: "v1"
+    metadata:
+      name: "application"
+  - kind: "Service"
+    apiVersion: "v1"
+    metadata:
+      name: "application"
+      description: "Rack application"
+    spec:
+      ports:
+        - name: "web"
+          port: 80
+          targetPort: 9292
+      selector:
+        name: "application"
+  - kind: "Route"
+    apiVersion: "v1"
+    metadata:
+      name: "application-route"
+    spec:
+      host: "app.lvh.me"
+      to:
+        kind: "Service"
+        name: "application"
+
+  - kind: "BuildConfig"
+    apiVersion: "v1"
+    metadata:
+      name: "build-app"
+    spec:
+      output:
+        to:
+          kind: "ImageStreamTag"
+          name: "application:latest"
+      runPolicy: "Serial"
+      triggers:
+        - type: "ImageChange"
+      source:
+        type: "Git"
+        git:
+          uri: "https://github.com/hallelujah/openshift-env-testing.git"
+          ref: "master"
+      strategy:
+        type: Docker
+        dockerStrategy:
+          env:
+            - name: GREETING
+              value: ${GREETING}
+
+
+parameters:
+  - name: GREETING
+    description: "Some env variable"
+    required: false
+    value: "Aloha!"
